@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Doações</title>
+</head>
+<body>
+  <h1>Formulário de Doação</h1>
+
+  <label for="item">Item:</label>
+  <select id="item"></select>
+
+  <label for="quantidade">Quantidade:</label>
+  <input type="number" id="quantidade" />
+
+  <button onclick="submeter()">Doar</button>
+
+  <p id="mensagem"></p>
+
+  <script>
+    const backend = "https://donate-encontrao.onrender.com";
+
+    async function carregarEstoque() {
+      const res = await fetch(`${backend}/estoque`);
+      const data = await res.json();
+      const select = document.getElementById("item");
+
+      for (let nome in data) {
+        const option = document.createElement("option");
+        option.value = nome;
+        option.textContent = `${nome} (estoque: ${data[nome]})`;
+        select.appendChild(option);
+      }
+    }
+
+    async function submeter() {
+      const item = document.getElementById("item").value;
+      const quantidade = document.getElementById("quantidade").value;
+
+      const res = await fetch(`${backend}/doacao`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({item, quantidade})
+      });
+
+      const data = await res.json();
+      document.getElementById("mensagem").innerText = data.mensagem || "Erro!";
+    }
+
+    carregarEstoque();
+  </script>
+</body>
+</html>
